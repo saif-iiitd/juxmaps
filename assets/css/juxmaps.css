@@ -304,6 +304,55 @@ html[data-theme="dark"] .jm-city[aria-pressed="true"] span{color:rgba(0,0,0,.55)
   letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:9px;
 }
 
+/* ------------------------------ Add a map ------------------------------ */
+.jm-addmap{margin:0 0 18px}
+.jm-addmap-toggle{
+  display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink-2);
+  border:1px dashed var(--rule);border-radius:999px;padding:8px 15px;min-height:38px;
+  transition:border-color .15s,color .15s,background .15s;
+}
+.jm-addmap-toggle:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.jm-addmap-toggle svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;transition:transform .15s}
+.jm-addmap-toggle[aria-expanded="true"] svg{transform:rotate(45deg)}
+.jm-addmap-form{
+  margin-top:12px;padding:16px 17px;background:var(--card);border:1px solid var(--rule);border-radius:var(--r-m);
+  max-width:640px;
+}
+.jm-addmap-hint{margin:0 0 12px;font-size:12.5px;color:var(--ink-2);line-height:1.55}
+.jm-addmap-row{display:flex;gap:8px;flex-wrap:wrap}
+.jm-addmap-archive{
+  flex:0 0 auto;border:1px solid var(--rule);background-color:var(--card-2);min-width:132px;
+}
+.jm-addmap-input{
+  flex:1 1 220px;min-width:0;border:1px solid var(--rule);background:var(--card-2);color:var(--ink);
+  border-radius:var(--r-m);padding:9px 13px;font-size:13.5px;min-height:40px;
+}
+.jm-addmap-input:focus-visible{border-color:var(--accent)}
+.jm-addmap-go{
+  flex:0 0 auto;background:var(--accent);color:#fff;font-weight:600;font-size:13.5px;
+  border-radius:var(--r-m);padding:9px 20px;min-height:40px;transition:opacity .15s;
+}
+.jm-addmap-go:hover{opacity:.9}
+.jm-addmap-go:disabled{opacity:.5;cursor:progress}
+html[data-theme="dark"] .jm-addmap-go{color:#17150f}
+.jm-addmap-status{margin:10px 0 0;font-size:12.5px;min-height:1.4em;color:var(--ink-2)}
+.jm-addmap-status.is-error{color:var(--accent);font-weight:600}
+.jm-addmap-status.is-success{color:var(--teal);font-weight:600}
+.jm-addmap-status.is-pending{color:var(--ink-3)}
+
+/* gallery card marker for a reader-added map */
+.jm-card-mine{
+  position:absolute;bottom:8px;right:8px;z-index:2;display:flex;align-items:center;gap:5px;
+  background:rgba(23,21,15,.86);color:#fff;font-size:9.5px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;padding:3px 3px 3px 8px;border-radius:99px;
+}
+.jm-card-mine button{color:#fff;opacity:.75;font-size:14px;line-height:1;padding:1px 4px;border-radius:50%}
+.jm-card-mine button:hover{opacity:1;background:rgba(255,255,255,.15)}
+.jm-card.is-user .jm-card-b{border-top:2px dashed var(--rule)}
+
+/* dynamically-appended row in the Sources list for a reader-added map */
+.jm-src-user .jm-src-t span{color:var(--teal)}
+
 /* ------------------------------ Gallery ------------------------------ */
 .jm-gal{display:grid;gap:15px;grid-template-columns:repeat(auto-fill,minmax(215px,1fr))}
 .jm-card{
@@ -513,6 +562,8 @@ html[data-theme="dark"] .jm-card-on svg{stroke:#17150f}
   .jm-src{grid-template-columns:46px 1fr;gap:10px}
   .jm-src-l{grid-column:2;justify-content:flex-start;margin-top:4px}
   .jm-steps{grid-template-columns:1fr}
+  .jm-addmap-row{flex-direction:column;align-items:stretch}
+  .jm-addmap-archive{width:100%}
 }
 @media (max-width:430px){
   .jm-gal{grid-template-columns:1fr 1fr}

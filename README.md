@@ -21,6 +21,12 @@ Claude Code preview can start the same server by name (`juxmaps`).
 Leaflet is vendored in `assets/vendor/leaflet/`, so the only network traffic at
 runtime is map tiles and the Google Fonts stylesheet.
 
+`index.html` references `juxmaps.css`, `catalogue.js` and `app.js` with a
+`?v=N` query string. Bump that number whenever any of those three files
+change and get deployed — otherwise returning visitors' browsers can keep
+serving a stale cached copy indefinitely, since there's no build step to
+fingerprint the filenames.
+
 ## What it does
 
 - **Eight cities** — London, Paris, Rome, Istanbul, Jerusalem, Cape Town, Mumbai, Mexico City.
@@ -36,6 +42,12 @@ runtime is map tiles and the Google Fonts stylesheet.
 - **Gallery** of the city's sheets, each previewed from its own warped tiles.
 - **Deep links** — the URL carries the city and the sheet, e.g.
   `#paris/79748`, so a particular juxtaposition can be shared.
+- **Add a map** — paste a link or ID for any record already georeferenced on
+  Map Warper or Wikimaps Warper and it's added to the current city's gallery
+  for the session. Nothing is uploaded: the app calls that record's public
+  API, confirms it actually serves tiles, and only then shows it. See
+  "Add a map" below for the full design and why it stops at this and not
+  raw image uploads.
 
 ## Layout
 
@@ -73,6 +85,49 @@ platform. Adding a third archive needs no code change.
 Base maps and services: OpenStreetMap, CARTO, Esri/Maxar, OpenTopoMap,
 Nominatim, Leaflet.
 
+## Add a map
+
+Readers can paste a link or bare ID for a record already georeferenced on
+Map Warper (`mw`) or Wikimaps Warper (`wm`), from the panel under any city's
+gallery. This is deliberately the smallest useful slice of "let users add
+maps" — see the four-tier design discussion from this project's history for
+why raw image uploads are a separate, much larger feature that this stops
+short of.
+
+**How it works:**
+
+1. `parseMapInput()` accepts a full URL (either archive's `/maps/{id}`
+   pages), a bare numeric ID (paired with the archive `<select>`), or an
+   already-prefixed `mw:123` / `wm:123` (used internally for routing).
+2. `fetchAndVerifyMap()` calls that record's public API directly from the
+   browser — both archives are genuinely CORS-open, confirmed with a live
+   `fetch()` before this was built, not assumed from `curl`. It checks
+   `status === "warped"`, then **proves the record actually serves a tile**
+   at a couple of computed zoom levels before accepting it. This check
+   exists because a real share of "warped" records on these archives serve
+   nothing — confirmed during this project's research (five Rome
+   masterplans, three Shanghai maps, the Delhi 1812 sheet, and Cape Town's
+   best candidate all claim `"status":"warped"` and return empty tiles).
+   Skipping this check means a broken paste looks like a broken tool.
+3. On success the map is pushed into `state.userOverlays[cityId]` — a
+   session-only structure, separate from the curated `JUX_CITIES` catalogue
+   — and the gallery, dock, map attribution and Sources list all render it,
+   each marked as reader-added rather than curated.
+4. The page hash becomes `#city/mw:12345`. There is no server-side storage:
+   a shared link is resolved by **re-fetching and re-verifying live** on
+   load (`resolveOverlayId()`), so persistence comes from the archive being
+   the source of truth, not from anything JuxMaps stores.
+5. Adding a map that's already in the curated gallery (by archive + numeric
+   ID, regardless of which id form it's stored under) reuses the existing
+   entry rather than creating a duplicate card.
+
+**Deliberately out of scope:** raw image uploads. Turning a scan into
+something placeable on a map is the georeferencing step itself — matching
+control points and warping the image — and doing that well needs real
+tooling, not a quick client-side fit. A reader with an ungeoreferenced scan
+is pointed to Map Warper instead; once it's georeferenced there, it comes
+back through this same feature.
+
 ## Known limits
 
 These are stated on the page itself, in the Methodology section, and they are
@@ -99,6 +154,11 @@ the honest boundary of what this prototype supports:
   `warper.wmflabs.org`, which runs on Wikimedia Cloud Services — less
   guaranteed uptime than `mapwarper.net`. If Cape Town goes blank, check that
   host first.
+- **Reader-added maps are unreviewed and session-only.** The tile-serving
+  check runs for them too, but title, date and description are whatever the
+  archive record says, with no editorial pass. They vanish on tab close
+  unless the URL still names them, in which case they're fetched fresh —
+  never stored server-side, because there is no server.
 
 ## Verification performed
 
@@ -110,6 +170,16 @@ the honest boundary of what this prototype supports:
   blanks. The four Cape Town sheets are capped at the zoom where their scan
   actually runs out of detail (z14–z18), so deep zooms upscale rather than
   fetch tiles that hold no more information.
+- **Add a map** was verified end-to-end in-browser, not just at the API
+  level: confirmed both archives are genuinely CORS-open (a real `fetch()`
+  with a readable body, not just a status code from `curl`); added a real
+  uncurated record from each archive through the actual UI and watched it
+  render, deep-link on a cold reload, and get removed cleanly; confirmed a
+  known-dead "warped" record is rejected with a clear error rather than
+  added blank; confirmed adding an ID already in the curated gallery reuses
+  that entry instead of creating a duplicate card. One caching bug was found
+  and fixed in the process — see the `?v=N` note above — where a stale
+  cached `app.js` made the whole feature look broken during testing.
 - Verified in-browser over `http://localhost`: routing, all seven base maps,
   both comparison modes, the swipe clip geometry under pan, theme toggle,
   and the mobile layout at 375×812. Not yet verified opening `index.html`

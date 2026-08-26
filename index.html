@@ -12,7 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">
-<link rel="stylesheet" href="assets/css/juxmaps.css">
+<link rel="stylesheet" href="assets/css/juxmaps.css?v=4">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%23f7f3ea' stroke='%2317150f' stroke-width='2'/><path d='M16 2a14 14 0 0 0 0 28z' fill='%235c6b2e'/></svg>">
 </head>
 <body>
@@ -156,6 +156,32 @@
         the badge says so.
       </p>
     </div>
+
+    <div class="jm-addmap">
+      <button class="jm-addmap-toggle" id="addMapToggle" type="button" aria-expanded="false" aria-controls="addMapForm">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        Add a map by link or ID
+      </button>
+      <form class="jm-addmap-form" id="addMapForm" hidden>
+        <p class="jm-addmap-hint">
+          Found a map already georeferenced on Map Warper or Wikimaps Warper? Paste its link or ID below
+          and we&rsquo;ll place it on the map &mdash; nothing is uploaded, we just check that the record
+          is real and actually serves tiles before showing it. It lasts for this browsing session; copy
+          the page URL afterwards to keep a working link, since it&rsquo;s re-fetched fresh each time.
+        </p>
+        <div class="jm-addmap-row">
+          <select class="jm-select jm-glass jm-addmap-archive" id="addMapArchive" aria-label="Archive to use if you paste a bare ID">
+            <option value="mw">Map Warper</option>
+            <option value="wm">Wikimaps Warper</option>
+          </select>
+          <input class="jm-addmap-input" id="addMapInput" type="text" inputmode="url" autocomplete="off" spellcheck="false"
+                 placeholder="mapwarper.net/maps/12345, or just 12345" aria-label="Map Warper or Wikimaps Warper link or ID">
+          <button class="jm-addmap-go" id="addMapGo" type="submit">Add</button>
+        </div>
+        <p class="jm-addmap-status" id="addMapStatus" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+
     <div class="jm-gal" id="gallery"></div>
     <p class="jm-gal-note" id="cityStory"></p>
   </section>
@@ -230,6 +256,22 @@
           agrees with the modern one.
         </p>
       </li>
+      <li class="jm-step">
+        <div class="jm-step-n">6</div>
+        <h3>Or add one yourself</h3>
+        <p>
+          Steps 1&ndash;4 already happened for thousands of maps on <b>Map Warper</b> and
+          <b>Wikimaps Warper</b>, open platforms where anyone can georeference a scan. Found one that
+          isn&rsquo;t in our gallery? Paste its link under any city&rsquo;s gallery and JuxMaps will fetch
+          it, confirm it actually serves map tiles, and place it &mdash; nothing is uploaded to us.
+        </p>
+        <p>
+          This deliberately stops short of accepting a raw image upload. Turning a scan into something
+          that can sit on a map <em>is</em> steps 2&ndash;3 above, and doing that well takes real
+          georeferencing tools, not a quick fit in a browser. Send well-chosen maps to Map Warper instead
+          &mdash; once they&rsquo;re georeferenced there, they can come straight back here.
+        </p>
+      </li>
     </ol>
 
     <div class="jm-caveat">
@@ -243,6 +285,7 @@
         <li><b>Control points are not published.</b> Map Warper holds the actual point pairs for each sheet, but its export is not open to automated access, so we cannot show you counts or error figures here. Each Sources entry links to the record so you can inspect it directly.</li>
         <li><b>Reference-point coordinates are measured; the choice of them is editorial.</b> Positions were resolved through OpenStreetMap&rsquo;s Nominatim service; which landmarks to include, and the founding dates shown, are ours and approximate.</li>
         <li><b>Do not measure off these overlays.</b> Use them to see change and to generate questions &mdash; then go to the archival source before publishing a claim.</li>
+        <li><b>Maps you add yourself are session-only, and unreviewed by us.</b> They disappear when you close the tab, unless the page URL still names them, in which case they&rsquo;re re-fetched and re-checked live &mdash; never stored. We don&rsquo;t vet them editorially the way we did the curated gallery; the same tile-serving check runs, but title, date and description come straight from the archive record.</li>
       </ul>
     </div>
   </section>
@@ -358,7 +401,7 @@
 <div class="jm-toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="assets/vendor/leaflet/leaflet.js"></script>
-<script src="assets/js/catalogue.js"></script>
-<script src="assets/js/app.js"></script>
+<script src="assets/js/catalogue.js?v=4"></script>
+<script src="assets/js/app.js?v=4"></script>
 </body>
 </html>
